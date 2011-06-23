@@ -175,4 +175,7 @@ function endGame(){
    clearTimeout(timeout);
    clearInterval(interval);
    $('#wordEntry').attr("disabled", true); 
+   $.get("http://localhost:3000/solution?id="+results.Id,function(data){
+      console.log($.parseJSON(data));
+   });
 }

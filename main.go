@@ -11,6 +11,7 @@ import "container/vector"
 import "sort"
 import "crypto/sha1"
 import "json"
+import "time"
 
 const boardSize = 4
 
@@ -26,6 +27,7 @@ type Solution struct {
    Count int
    SolutionSize map[string]int
    MaxScore int
+   timer *time.Timer
 }
 
 var addr = flag.String("addr", ":3000", "http service address")
@@ -35,6 +37,8 @@ var fmap = template.FormatterMap{
 var templ = template.MustParse(templateStr, fmap)
 
 var dict *Trie
+var solutionBasket map[string]Solution
+
 func main(){
    dict = new(Trie)
    
@@ -57,21 +61,39 @@ func main(){
    }
    fmt.Printf("DONE\n  Loaded %d words\n",i)
    
+   solutionBasket = make(map[string]Solution)
    
-   http.Handle("/",http.HandlerFunc(wordRequest))
+   
+   http.Handle("/",http.HandlerFunc(hashRequest))
+   http.Handle("/solution",http.HandlerFunc(solutionRequest))
    err = http.ListenAndServe(*addr, nil)
    
 }
 
-func wordRequest(w http.ResponseWriter, req *http.Request){
+func solutionRequest(w http.ResponseWriter, req *http.Request){
+   id := req.FormValue("id")
+   
+   fmt.Printf("\n<----------------------SOLUTION REQUEST------------------------>\n")
+   fmt.Printf("ID: %s\n",id)
+   
+   solution,exists := solutionBasket[id]
+   if !exists {
+      return
+   } 
+   
+   response,_ := json.Marshal(solution.words)
+   
+   templ.Execute(w, response)
+}
+
+func hashRequest(w http.ResponseWriter, req *http.Request){
    lettersIn := req.FormValue("letters")
    if len(lettersIn) != 16{
       return
    }
    
    
-   fmt.Printf("<---------------------------------------------------------->\n")
-   fmt.Printf("letters: %s\n",lettersIn)
+   fmt.Printf("\n<------------------------HASH REQUEST-------------------------->\n")
    var letters []uint8 = make([]uint8,len(lettersIn))
    for i := 0; i<len(lettersIn); i++ {
       letters[i] = letterToInt(lettersIn[i])
@@ -104,12 +126,32 @@ func wordRequest(w http.ResponseWriter, req *http.Request){
    sort.Sort(&(solution.words))
    removeDuplicates(solution)
    hashWords(solution)
-   fmt.Printf("%s\n",solution.words)
-   fmt.Printf("%d words\n",solution.Count)
    
    response,_ := json.Marshal(solution)
    
+
+   id := fmt.Sprintf("%s",solution.Id)
+   
+   //set the timer                 300 000 000 000
+   solution.timer = time.AfterFunc(300000000000,func (){solutionExpired(id)})
+   
+   //remove all un needed content
+   solution.Hashs = nil
+   solution.SolutionSize = nil
+   
+   
+   //add to the solution basket
+   solutionBasket[id] = *solution
+   
+   
+   fmt.Printf("ID: %s\n",solution.Id)
+
    templ.Execute(w, response)
+}
+
+func solutionExpired(id string){
+   fmt.Printf("\n<----------------------SOLUTION EXPIRED------------------------>\n")
+   fmt.Printf("ID: %s\n",id)
 }
 
 func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solution *Solution){
