@@ -91,6 +91,7 @@ function shake() {
   $.get("http://localhost:3000/?letters="+board_id,function(data){
        results = $.parseJSON(data);
        updateStats();
+       $("#wordEntry").removeAttr("disabled");
        $("#wordEntry").focus();
        startTime = new Date().getTime();
        updateTimer();
@@ -172,4 +173,5 @@ function endGame(){
    alert("Your time is up!");
    clearTimeout(timeout);
    clearInterval(interval);
+   $('#wordEntry').attr("disabled", true); 
 }
