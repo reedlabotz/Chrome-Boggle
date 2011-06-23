@@ -90,6 +90,7 @@ function shake() {
   }
   $.get("http://localhost:3000/?letters="+board_id,function(data){
        results = $.parseJSON(data);
+       console.log(results);
        updateStats();
        $("#wordEntry").removeAttr("disabled");
        $("#wordEntry").focus();
@@ -124,7 +125,7 @@ function checkWord(){
 }
 
 function updateStats(){
-   $("#stats").html("<p>Guesses: "+guesses+"</p><p>Correct: "+correct+"/"+results.Count+"</p><p>Score: "+score+"</p>");
+   $("#stats").html("<p>Guesses: "+guesses+"</p><p>Correct: "+correct+"/"+results.Count+"</p><p>Score: "+score+"</p><p>Max Score: "+results.MaxScore+"</p>");
 }
 
 function reset(){

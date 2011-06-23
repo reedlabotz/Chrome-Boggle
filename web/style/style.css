@@ -2,6 +2,12 @@
    border:none;
    border-spacing:8px;
 }
+#board{
+   background:#F0F0F0;
+   border-radius:3px;
+   display:block;
+   float:left;
+}
 #board td {
   width: 48px;
   height: 48px;

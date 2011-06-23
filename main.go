@@ -24,6 +24,8 @@ type Solution struct {
    words vector.StringVector
    Hashs vector.StringVector
    Count int
+   SolutionSize map[string]int
+   MaxScore int
 }
 
 var addr = flag.String("addr", ":3000", "http service address")
@@ -86,10 +88,10 @@ func wordRequest(w http.ResponseWriter, req *http.Request){
    
    
    solution := new(Solution)
-   
    solution.Count = 0
-   
    solution.Id = NewV4()
+   solution.SolutionSize = map[string]int{"3":0, "4":0, "5":0, "6":0, "7":0, "8":0, "9":0, "10":0, "11":0, "12":0, "13":0, "14":0, "15":0, "16":0}
+   solution.MaxScore = 0
    
    
    for i := 0; i<boardSize; i++ {
@@ -107,7 +109,6 @@ func wordRequest(w http.ResponseWriter, req *http.Request){
    
    response,_ := json.Marshal(solution)
    
-
    templ.Execute(w, response)
 }
 
@@ -130,12 +131,15 @@ func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solutio
       soFar = soFar[0:len(soFar)+1]
       soFar[len(soFar)-1] = 20
       good,dict = isWord(dict,u)
-      
    }
    
    if good && len(soFar) > 2{
-      solution.words.Push(arrayToWord(soFar))
+      word := arrayToWord(soFar)
+      solution.words.Push(word)
       solution.Count++
+      length := fmt.Sprintf("%d", len(word))
+      solution.SolutionSize[length]++
+      solution.MaxScore += getScore(word)
    }
    
    if dict != nil{
@@ -221,6 +225,9 @@ func removeDuplicates(solution *Solution){
          solution.Count--
          solution.words.Delete(i)
          i--
+         length := fmt.Sprintf("%d", len(word))
+         solution.SolutionSize[length]--
+         solution.MaxScore -= getScore(word)
       }
       last = word
    }  
@@ -237,6 +244,29 @@ func hashWords(solution *Solution){
       solution.Hashs.Push(sha1String)
    }
 
+}
+
+func getScore(word string) int{
+   length := len(word)
+   if length >= 8{
+      return 11
+   }
+   if length >= 7{
+      return 4
+   }
+   if length >= 6{
+      return 3
+   }
+   if length >= 5{
+      return 2
+   }
+   if length >= 4{
+      return 1
+   }
+   if length >= 3{
+      return 1
+   }
+   return 0
 }
 
 const templateStr = `{@|words}`
