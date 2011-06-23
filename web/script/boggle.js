@@ -110,7 +110,10 @@ function checkWord(){
       var i = $.inArray(hash,results.Words)
       if(i >= 0){
          results.Words.splice(i,1);
-         $("#wordList").prepend("<div class='word'>" + word + "</div>");
+         newWord = $(document.createElement("div"));
+         newWord.html(word);
+         $("#wordList").prepend(newWord);
+         newWord.effect("highlight", {}, 3000);
          correct += 1;
          score += getScore(word);
       }
