@@ -60,6 +60,7 @@ func main(){
       i++
    }
    fmt.Printf("DONE\n  Loaded %d words\n",i)
+   file.Close()
    
    solutionBasket = make(map[string]Solution)
    
