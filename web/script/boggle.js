@@ -19,6 +19,8 @@ var cubes = new Array(
 
 var board;
 var results;
+var correct = 0;
+var guesses = 0;
 
 function Board(w, h, rules) {
   this.width = w;
@@ -31,8 +33,7 @@ function boggle_init() {
   board = new Board(4,4,"defaults");
   var i,j;
   
-  var board_div = document.createElement("div");
-  board_div.id = "board";
+  var board_div = $("#board")
   
   var table = document.createElement("table");
   for(i=0; i<board.height; i++) {
@@ -45,19 +46,13 @@ function boggle_init() {
     }
   }
   
-  board_div.appendChild(table);
+  board_div.append(table);
   
   var button = document.createElement("input");
   button.type="button";
   button.value="Shake!";
   button.onclick=shake;
-  board_div.appendChild(button);
-  
-  document.body.appendChild(board_div);
-  
-  var words = document.createElement("div");
-  words.id = "wordlist";
-  document.body.appendChild(words);
+  board_div.append(button);
 
   shake();
 }
@@ -94,10 +89,23 @@ function shake() {
 function checkWord(){
    var word = $("#wordEntry").val().toLowerCase();
    $("#wordEntry").val("");
-   var hash = Sha1.hash(word + results.Id);
-   if($.inArray(hash,results.Words) >= 0){
-      console.log("you got one: "+word);
-      $("#wordlist").prepend("<div class='word'>" + word + "</div>");
+   if(word != ""){
+      guesses += 1;
+      var hash = Sha1.hash(word + results.Id);
+      var i = $.inArray(hash,results.Words)
+      if(i >= 0){
+         results.Words.splice(i,1);
+         console.log("you got one: "+word);
+         $("#wordList").prepend("<div class='word'>" + word + "</div>");
+         correct += 1;
+      }
    }
+   console.log("Guesses: " + guesses);
+   console.log("Connect: " + correct);
+   updateStats();
    return false;
+}
+
+function updateStats(){
+   $("#stats").html("<p>Guesses: "+guesses+"</p><p>Correct: "+correct+"/"+results.Count+"</p>")
 }

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style/style.css">
     <script>
     $(document).ready(function(){
+       $("#wordEntry").focus();
        $("#wordEntry").keypress(function(e){
           code= (e.keyCode ? e.keyCode : e.which);
           if (code == 13 || code == 32){
@@ -18,6 +19,13 @@
     </script>
   </head>
   <body onLoad="boggle_init()">
-     <input type="text" id="wordEntry" />
+     <div id="board">
+     </div>
+     <div id="wordList"></div>
+     <div id="wordEntryHolde">
+        <input type="text" id="wordEntry" />
+     </div>
+     <div id="stats">
+     </div>
   </body>
 </html>
