@@ -21,6 +21,7 @@ var board;
 var results;
 var correct = 0;
 var guesses = 0;
+var score = 0;
 
 function Board(w, h, rules) {
   this.width = w;
@@ -58,6 +59,7 @@ function boggle_init() {
 }
 
 function shake() {
+  reset();
   var temp_cubes = new Array();
   var i, j;
   var board_id = "";
@@ -83,7 +85,11 @@ function shake() {
   }
   $.get("http://localhost:3000/?letters="+board_id,function(data){
        results = $.parseJSON(data);
+       updateStats();
+       $("#wordEntry").focus();
     });
+    
+    
 }
 
 function checkWord(){
@@ -95,17 +101,41 @@ function checkWord(){
       var i = $.inArray(hash,results.Words)
       if(i >= 0){
          results.Words.splice(i,1);
-         console.log("you got one: "+word);
          $("#wordList").prepend("<div class='word'>" + word + "</div>");
          correct += 1;
+         score += getScore(word);
       }
    }
-   console.log("Guesses: " + guesses);
-   console.log("Connect: " + correct);
    updateStats();
    return false;
 }
 
 function updateStats(){
-   $("#stats").html("<p>Guesses: "+guesses+"</p><p>Correct: "+correct+"/"+results.Count+"</p>")
+   $("#stats").html("<p>Guesses: "+guesses+"</p><p>Correct: "+correct+"/"+results.Count+"</p><p>Score: "+score+"</p>");
+}
+
+function reset(){
+   $("#wordList").html("");
+   $("#stats").html("");
+   $("#wordEntry").val("");
+   correct = 0;
+   guesses = 0;
+   score = 0;
+}
+
+function getScore(word){
+   var length = word.length;
+   if(length >= 8)
+      return 11;
+   if(length >= 7)
+      return 4;
+   if(length >= 6)
+      return 3;
+   if(length >= 5)
+      return 2;
+   if(length >= 4)
+      return 1;
+   if(length >= 3)
+      return 1;
+   return 0;
 }

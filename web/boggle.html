@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style/style.css">
     <script>
     $(document).ready(function(){
-       $("#wordEntry").focus();
        $("#wordEntry").keypress(function(e){
           code= (e.keyCode ? e.keyCode : e.which);
           if (code == 13 || code == 32){
