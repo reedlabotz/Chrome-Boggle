@@ -23,6 +23,11 @@ var correct = 0;
 var guesses = 0;
 var score = 0;
 
+//vars needed by the timer
+var timeout;
+var interval;
+var startTime;
+
 function Board(w, h, rules) {
   this.width = w;
   this.height = h;
@@ -87,6 +92,10 @@ function shake() {
        results = $.parseJSON(data);
        updateStats();
        $("#wordEntry").focus();
+       startTime = new Date().getTime();
+       updateTimer();
+       timeout = setTimeout("endGame()",180000);
+       interval = setInterval("updateTimer()",1000);
     });
     
     
@@ -117,10 +126,26 @@ function updateStats(){
 function reset(){
    $("#wordList").html("");
    $("#stats").html("");
+   $("#timer").html("");
    $("#wordEntry").val("");
    correct = 0;
    guesses = 0;
    score = 0;
+   clearTimeout(timeout);
+   clearInterval(interval);
+}
+
+function updateTimer(){
+   var timeDiff = (new Date().getTime()) - startTime;
+   var seconds = 180 - Math.round(timeDiff/1000);
+   
+   var min = Math.floor(seconds/60);
+   var sec = seconds % 60;
+   var secSpace = "";
+   if(sec<10){
+      secSpace = "0";
+   }
+   $("#timer").html("<p>Time: "+min+":"+secSpace+sec+"</p>");
 }
 
 function getScore(word){
@@ -138,4 +163,10 @@ function getScore(word){
    if(length >= 3)
       return 1;
    return 0;
+}
+
+function endGame(){
+   alert("Your time is up!");
+   clearTimeout(timeout);
+   clearInterval(interval);
 }

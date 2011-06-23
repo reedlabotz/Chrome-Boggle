@@ -1,8 +1,18 @@
-td {
+#board table{
+   border:none;
+   border-spacing:8px;
+}
+#board td {
   width: 48px;
   height: 48px;
   text-align: center;
-  font: bold 40px helvetica; 
+  font-size: 40px;
+  font-weight:bold; 
+  font-family: helvetica;
+  background:#e2d6cf;
+  border-radius:3px;
+  padding:5px;
+  border:1px solid #603a27;
 }
 
 td .qu {
