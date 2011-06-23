@@ -1,0 +1,16 @@
+{
+  "name": "Boggle",
+  "description": "The game of Boggle",
+  "version": "0.0.1",
+  "app": {
+    "launch": {
+      "local_path": "boggle.html"
+    }
+  },
+  "icons": {
+    "160": "icon.png"
+  },
+  "permissions": [ 
+   "http://localhost/" 
+  ]
+}

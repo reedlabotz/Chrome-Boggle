@@ -1,0 +1,234 @@
+package main
+
+import "fmt"
+import "os"
+import "bufio"
+import "http"
+import "flag"
+import "template"
+import "strings"
+import "container/vector"
+import "sort"
+import "crypto/sha1"
+import "json"
+
+const boardSize = 4
+
+type Trie struct {
+   children [26]*Trie
+   isWord bool
+}
+
+type Solution struct {
+   Id *UUID
+   Words vector.StringVector 
+   Count int
+}
+
+var addr = flag.String("addr", ":3000", "http service address")
+var fmap = template.FormatterMap{
+    "words": template.StringFormatter,
+}
+var templ = template.MustParse(templateStr, fmap)
+
+var dict *Trie
+func main(){
+   dict = new(Trie)
+   
+   file, err := os.Open("dictionary.txt")
+   if err != nil{
+      fmt.Printf("There was an error opening the dictionary\n")
+      return
+   }
+   reader := bufio.NewReader(file)
+   fmt.Printf("Loading dictionary....")
+   i := 0
+   for {
+      line, _, err := reader.ReadLine()
+      if err == os.EOF {
+         break
+      }
+      
+      addWord(dict,line)
+      i++
+   }
+   fmt.Printf("DONE\n  Loaded %d words\n",i)
+   
+   
+   http.Handle("/",http.HandlerFunc(wordRequest))
+   err = http.ListenAndServe(*addr, nil)
+   
+}
+
+func wordRequest(w http.ResponseWriter, req *http.Request){
+   lettersIn := req.FormValue("letters")
+   if len(lettersIn) != 16{
+      return
+   }
+   
+   
+   fmt.Printf("<---------------------------------------------------------->\n")
+   fmt.Printf("letters: %s\n",lettersIn)
+   var letters []uint8 = make([]uint8,len(lettersIn))
+   for i := 0; i<len(lettersIn); i++ {
+      letters[i] = letterToInt(lettersIn[i])
+   }
+   
+   fmt.Printf("board: \n")
+   for i := 0; i<boardSize; i++ {
+      for j := 0; j<boardSize; j++{
+         letter := intToLetter(letterAt(i,j,letters))
+         fmt.Printf(" %s",strings.ToUpper(string(letter)))
+      }
+      fmt.Printf("\n")
+   }
+   
+   
+   solution := new(Solution)
+   
+   solution.Count = 0
+   
+   solution.Id = NewV4()
+   
+   
+   for i := 0; i<boardSize; i++ {
+      for j := 0; j<boardSize; j++{
+         soFar := make([]uint8,2*(boardSize*boardSize))
+         checkString(i,j,letters,soFar[0:0],dict,solution)
+      }
+   }
+   
+   sort.Sort(&(solution.Words))
+   fmt.Printf("%s\n",solution.Words)
+   hashWords(solution)
+   fmt.Printf("%d words\n",solution.Count)
+   
+   response,_ := json.Marshal(solution)
+   
+
+   templ.Execute(w, response)
+}
+
+func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solution *Solution){
+   letter := letterAt(x,y,letters)
+   if letter == 255{
+      return
+   }
+   
+   soFar = soFar[0:len(soFar)+1]
+   soFar[len(soFar)-1] = letter
+   
+   letters[(boardSize*x)+y] = 255
+   
+   good,dict := isWord(dict,soFar[len(soFar)-1:len(soFar)])
+   
+   if letter == 16 && dict != nil{
+      u := make([]uint8,1)
+      u[0] = 20
+      soFar = soFar[0:len(soFar)+1]
+      soFar[len(soFar)-1] = 20
+      good,dict = isWord(dict,u)
+      
+   }
+   
+   if good && len(soFar) > 2{
+      solution.Words.Push(arrayToWord(soFar))
+      solution.Count++
+   }
+   
+   if dict != nil{
+      //check S
+      checkString(x+1,y,letters,soFar,dict,solution)
+      
+      //check E
+      checkString(x,y+1,letters,soFar,dict,solution)
+      
+      //check N
+      checkString(x-1,y,letters,soFar,dict,solution)
+      
+      //check W
+      checkString(x,y-1,letters,soFar,dict,solution)
+      
+      //check NE
+      checkString(x-1,y-1,letters,soFar,dict,solution)
+      
+      //check SW
+      checkString(x+1,y+1,letters,soFar,dict,solution)
+      
+      //check SE
+      checkString(x+1,y-1,letters,soFar,dict,solution)
+      
+      //check NW
+      checkString(x-1,y+1,letters,soFar,dict,solution)
+   }
+   letters[(boardSize*x)+y] = letter
+}
+
+func letterAt(x int,y int ,letters []uint8) uint8{
+   if x<0 || x > boardSize-1 || y < 0 || y > boardSize-1{
+      return 255
+   }
+   pos := (boardSize*x)+y
+   return letters[pos]
+}
+
+func isWord(dict *Trie, word []uint8) (bool,*Trie){
+   if len(word) == 0{
+      return dict.isWord, dict
+   }
+   letter := word[0]
+   if dict.children[letter] == nil {
+      return false, nil
+   }
+   return isWord(dict.children[letter],word[1:])
+}
+
+func addWord(dict *Trie, word []uint8){
+   if len(word) == 0 {
+      dict.isWord = true
+      return
+   }
+   letter := letterToInt(word[0])
+   if dict.children[letter] == nil {
+      dict.children[letter] = new(Trie)
+   }
+   addWord(dict.children[letter],word[1:])
+}
+
+func letterToInt(letter uint8) uint8{
+   return letter-97
+}
+
+func intToLetter(letter uint8) uint8{
+   return letter+97
+}
+
+func arrayToWord(letters []uint8) string{
+   out := ""
+   for i := 0; i<len(letters); i++{
+      out += string(intToLetter(letters[i]))
+   }
+   return out
+}
+
+func hashWords(solution *Solution){
+   last := ""
+   id := solution.Id.String()
+   for i := 0;i<len(solution.Words); i++{
+      word := solution.Words.At(i)
+      if word == last{
+         solution.Count--
+         solution.Words.Delete(i)
+         i--
+      }else{
+         sha1 := sha1.New()
+         sha1.Write([]byte(word+id))
+         sha1String := fmt.Sprintf("%x", sha1.Sum())
+         
+         solution.Words.Set(i,sha1String)
+      }
+      last = word
+   }
+}
+
+const templateStr = `{@|words}`

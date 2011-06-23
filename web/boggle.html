@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Boggle!</title>
+    <script type="text/javascript" src="script/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="script/boggle.js"></script>
+    <script type="text/javascript" src="script/sha1.js"></script>
+    <link rel="stylesheet" href="style/style.css">
+    <script>
+    $(document).ready(function(){
+       $("#wordEntry").keypress(function(e){
+          code= (e.keyCode ? e.keyCode : e.which);
+          if (code == 13 || code == 32){
+            e.preventDefault();
+            checkWord();
+          }
+         });
+    })
+    </script>
+  </head>
+  <body onLoad="boggle_init()">
+     <input type="text" id="wordEntry" />
+  </body>
+</html>
