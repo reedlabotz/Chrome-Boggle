@@ -108,9 +108,9 @@ function checkWord(){
    if(word != ""){
       guesses += 1;
       var hash = Sha1.hash(word + results.Id);
-      var i = $.inArray(hash,results.Words)
+      var i = $.inArray(hash,results.Hashs)
       if(i >= 0){
-         results.Words.splice(i,1);
+         results.Hashs.splice(i,1);
          newWord = $(document.createElement("div"));
          newWord.html(word);
          $("#wordList").prepend(newWord);

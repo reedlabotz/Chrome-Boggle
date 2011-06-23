@@ -21,7 +21,8 @@ type Trie struct {
 
 type Solution struct {
    Id *UUID
-   Words vector.StringVector 
+   words vector.StringVector
+   Hashs vector.StringVector
    Count int
 }
 
@@ -98,9 +99,10 @@ func wordRequest(w http.ResponseWriter, req *http.Request){
       }
    }
    
-   sort.Sort(&(solution.Words))
-   fmt.Printf("%s\n",solution.Words)
+   sort.Sort(&(solution.words))
+   removeDuplicates(solution)
    hashWords(solution)
+   fmt.Printf("%s\n",solution.words)
    fmt.Printf("%d words\n",solution.Count)
    
    response,_ := json.Marshal(solution)
@@ -132,7 +134,7 @@ func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solutio
    }
    
    if good && len(soFar) > 2{
-      solution.Words.Push(arrayToWord(soFar))
+      solution.words.Push(arrayToWord(soFar))
       solution.Count++
    }
    
@@ -211,24 +213,30 @@ func arrayToWord(letters []uint8) string{
    return out
 }
 
-func hashWords(solution *Solution){
+func removeDuplicates(solution *Solution){
    last := ""
-   id := solution.Id.String()
-   for i := 0;i<len(solution.Words); i++{
-      word := solution.Words.At(i)
+   for i := 0;i<len(solution.words); i++{
+      word := solution.words.At(i)
       if word == last{
          solution.Count--
-         solution.Words.Delete(i)
+         solution.words.Delete(i)
          i--
-      }else{
-         sha1 := sha1.New()
-         sha1.Write([]byte(word+id))
-         sha1String := fmt.Sprintf("%x", sha1.Sum())
-         
-         solution.Words.Set(i,sha1String)
       }
       last = word
+   }  
+}
+
+func hashWords(solution *Solution){
+   id := solution.Id.String()
+   for i := 0;i<len(solution.words); i++{
+      word := solution.words.At(i)
+      sha1 := sha1.New()
+      sha1.Write([]byte(word+id))
+      sha1String := fmt.Sprintf("%x", sha1.Sum())
+      
+      solution.Hashs.Push(sha1String)
    }
+
 }
 
 const templateStr = `{@|words}`
