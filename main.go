@@ -83,6 +83,11 @@ func solutionRequest(w http.ResponseWriter, req *http.Request){
    
    response,_ := json.Marshal(solution.words)
    
+   solution.timer.Stop()
+   
+   var a Solution
+   solutionBasket[id] = a,false
+   
    templ.Execute(w, response)
 }
 
@@ -132,8 +137,8 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
 
    id := fmt.Sprintf("%s",solution.Id)
    
-   //set the timer                 300 000 000 000
-   solution.timer = time.AfterFunc(300000000000,func (){solutionExpired(id)})
+   //set the timer                 210 000 000 000  - 3.5 minutes
+   solution.timer = time.AfterFunc(210000000000,func (){solutionExpired(id)})
    
    //remove all un needed content
    solution.Hashs = nil
@@ -152,6 +157,8 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
 func solutionExpired(id string){
    fmt.Printf("\n<----------------------SOLUTION EXPIRED------------------------>\n")
    fmt.Printf("ID: %s\n",id)
+   var a Solution
+   solutionBasket[id] = a,false
 }
 
 func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solution *Solution){
