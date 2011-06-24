@@ -42,12 +42,15 @@ td .qu {
 }
 
 #wordList{
-   -webkit-column-count: 8;
+   -webkit-column-count:10;
+   -webkit-column-gap:10px;
    list-style:none;
    padding:0px;
    margin:0px;
-   height:150px;
-   border: 1px solid black;
+   border:1px solid black;
+   padding:10px;
+   height:200px;
+   overflow-x:scroll;
 }
 
 #wordList div{
