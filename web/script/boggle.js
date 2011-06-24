@@ -22,6 +22,7 @@ var results;
 var correct = 0;
 var guesses = 0;
 var score = 0;
+var correctWords = [];
 
 //vars needed by the timer
 var timeout;
@@ -111,17 +112,32 @@ function checkWord(){
       var hash = Sha1.hash(word + results.Id);
       var i = $.inArray(hash,results.Hashs)
       if(i >= 0){
+         $("#wordEntry").effect("highlight", {"color":"#5EFB6E"}, 500);
          results.Hashs.splice(i,1);
-         newWord = $(document.createElement("div"));
-         newWord.html(word);
-         $("#wordList").prepend(newWord);
-         newWord.effect("highlight", {}, 3000);
+         correctWords.push(word);
+         correctWords.sort();
+         placeWord(word)
+         
          correct += 1;
          score += getScore(word);
+      }else{
+         $("#wordEntry").effect("highlight", {"color":"#E77471"}, 500);
       }
+      $("#word-"+word).effect("highlight", {}, 1000);
    }
    updateStats();
    return false;
+}
+
+function placeWord(word){
+   newWord = $(document.createElement("div"));
+   newWord.attr('id',"word-"+word)
+   newWord.html(word);
+   lastId = ($.inArray(word,correctWords)) - 1
+   if(lastId < 0){
+      $("#wordList").prepend(newWord);
+   }
+   $("#word-"+correctWords[lastId]).after(newWord);
 }
 
 function updateStats(){
@@ -136,6 +152,7 @@ function reset(){
    correct = 0;
    guesses = 0;
    score = 0;
+   correctWords = [];
    clearTimeout(timeout);
    clearInterval(interval);
 }

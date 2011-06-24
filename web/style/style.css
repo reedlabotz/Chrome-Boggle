@@ -1,3 +1,7 @@
+body{
+   font-family:helvetica;
+}
+
 #board table{
    border:none;
    border-spacing:8px;
@@ -14,13 +18,33 @@
   text-align: center;
   font-size: 40px;
   font-weight:bold; 
-  font-family: helvetica;
   background:#e2d6cf;
   border-radius:3px;
   padding:5px;
-  border:1px solid #603a27;
+  font-size: 34px;
 }
 
-td .qu {
-  font-size: 34px;
+#wordEntry{
+   border:1px solid black;
+   border-radius:10px;
+   background:#FFFFFF;
+   padding:5px;
+   padding-left:15px;
+}
+
+#wordEntry:focus{
+   outline:none;
+}
+
+#wordList{
+   -webkit-column-count: 8;
+   list-style:none;
+   padding:0px;
+   margin:0px;
+   height:150px;
+   border: 1px solid black;
+}
+
+#wordList div{
+   display: block;
 }
