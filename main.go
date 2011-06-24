@@ -155,7 +155,7 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
 }
 
 func solutionExpired(id string){
-   logger.Printf("SOLUTION EXPIRED\n%sID: %s",loggerTab,id)
+   logger.Printf("SOLUTION EXPIRED\n%sID: %s\n",loggerTab,id)
    var a Solution
    solutionBasket[id] = a,false
 }

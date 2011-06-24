@@ -194,7 +194,8 @@ function getScore(word){
 function endGame(){
    clearTimeout(timeout);
    clearInterval(interval);
-   $('#wordEntry').attr("disabled", true); 
+   $('#wordEntry').attr("disabled", true);
+   $("#wordEntry").val("Game Over"); 
    $.get("http://localhost:3000/solution?id="+results.Id,function(data){
       solutionWords = $.parseJSON(data);
       $.each(solutionWords,function(i,word){
