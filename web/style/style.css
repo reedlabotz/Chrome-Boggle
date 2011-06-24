@@ -53,3 +53,8 @@ td .qu {
 #wordList div{
    display: block;
 }
+
+
+.missed-word{
+   color:#E77471;
+}

@@ -54,12 +54,6 @@ function boggle_init() {
   }
   
   board_div.append(table);
-  
-  var button = document.createElement("input");
-  button.type="button";
-  button.value="Shake!";
-  button.onclick=shake;
-  board_div.append(button);
 
   shake();
 }
@@ -91,13 +85,12 @@ function shake() {
   }
   $.get("http://localhost:3000/?letters="+board_id,function(data){
        results = $.parseJSON(data);
-       console.log(results);
        updateStats();
        $("#wordEntry").removeAttr("disabled");
        $("#wordEntry").focus();
        startTime = new Date().getTime();
        updateTimer();
-       timeout = setTimeout("endGame()",180500);
+       timeout = setTimeout("endGame()",10500);//180500
        interval = setInterval("updateTimer()",1000);
     });
     
@@ -114,8 +107,6 @@ function checkWord(){
       if(i >= 0){
          $("#wordEntry").effect("highlight", {"color":"#5EFB6E"}, 500);
          results.Hashs.splice(i,1);
-         correctWords.push(word);
-         correctWords.sort();
          placeWord(word)
          
          correct += 1;
@@ -129,9 +120,13 @@ function checkWord(){
    return false;
 }
 
-function placeWord(word){
+function placeWord(word,missed){
+   correctWords.push(word);
+   correctWords.sort();
    newWord = $(document.createElement("div"));
    newWord.attr('id',"word-"+word)
+   if(missed)
+      newWord.addClass("missed-word");
    newWord.html(word);
    lastId = ($.inArray(word,correctWords)) - 1
    if(lastId < 0){
@@ -197,11 +192,17 @@ function getScore(word){
 }
 
 function endGame(){
-   alert("Your time is up!");
    clearTimeout(timeout);
    clearInterval(interval);
    $('#wordEntry').attr("disabled", true); 
    $.get("http://localhost:3000/solution?id="+results.Id,function(data){
-      console.log($.parseJSON(data));
+      solutionWords = $.parseJSON(data);
+      $.each(solutionWords,function(i,word){
+         if($.inArray(word,correctWords) < 0){
+            placeWord(word,true);
+            $("#word-"+word).effect("highlight", {"color":"#FFF8C6"}, 5000);
+         }
+      });
+
    });
 }
