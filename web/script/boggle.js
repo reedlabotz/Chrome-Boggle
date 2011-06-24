@@ -203,6 +203,5 @@ function endGame(){
             $("#word-"+word).effect("highlight", {"color":"#FFF8C6"}, 5000);
          }
       });
-
    });
 }

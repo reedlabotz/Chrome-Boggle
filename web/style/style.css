@@ -42,7 +42,7 @@ td .qu {
 }
 
 #wordList{
-   -webkit-column-count:10;
+   -webkit-column-count:6;
    -webkit-column-gap:10px;
    list-style:none;
    padding:0px;
@@ -50,7 +50,8 @@ td .qu {
    border:1px solid black;
    padding:10px;
    height:200px;
-   overflow-x:scroll;
+   width:400px;
+   overflow-x:auto;
 }
 
 #wordList div{
@@ -61,3 +62,4 @@ td .qu {
 .missed-word{
    color:#E77471;
 }
+
