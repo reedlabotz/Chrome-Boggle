@@ -97,7 +97,7 @@ function shake() {
        $("#wordEntry").focus();
        startTime = new Date().getTime();
        updateTimer();
-       timeout = setTimeout("endGame()",180000);
+       timeout = setTimeout("endGame()",180500);
        interval = setInterval("updateTimer()",1000);
     });
     
@@ -123,7 +123,7 @@ function checkWord(){
       }else{
          $("#wordEntry").effect("highlight", {"color":"#E77471"}, 500);
       }
-      $("#word-"+word).effect("highlight", {}, 1000);
+      $("#word-"+word).effect("highlight", {"color":"#FFF8C6"}, 5000);
    }
    updateStats();
    return false;
@@ -168,6 +168,15 @@ function updateTimer(){
       secSpace = "0";
    }
    $("#timer").html("<p>Time: "+min+":"+secSpace+sec+"</p>");
+   
+   if(seconds == 30)
+      $("#timer").effect("highlight", {"color":"#E77471"}, 5000);
+   if(seconds == 20)
+      $("#timer").effect("highlight", {"color":"#E77471"}, 5000);
+   if(seconds == 10)
+      $("#timer").effect("highlight", {"color":"#E77471"}, 5000);
+   if(seconds <= 5)
+      $("#timer").effect("highlight", {"color":"#E77471"}, 500);
 }
 
 function getScore(word){
