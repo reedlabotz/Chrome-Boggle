@@ -20,7 +20,12 @@ body{
   font-weight:bold; 
   background:#e2d6cf;
   border-radius:3px;
+  border:1px solid #603a27;
   padding:5px;
+  font-size: 34px;
+}
+
+td .qu {
   font-size: 34px;
 }
 
