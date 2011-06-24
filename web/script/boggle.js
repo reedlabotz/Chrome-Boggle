@@ -90,7 +90,7 @@ function shake() {
        $("#wordEntry").focus();
        startTime = new Date().getTime();
        updateTimer();
-       timeout = setTimeout("endGame()",10500);//180500
+       timeout = setTimeout("endGame()",180500);
        interval = setInterval("updateTimer()",1000);
     });
     
