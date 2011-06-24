@@ -6,12 +6,15 @@ import "bufio"
 import "http"
 import "flag"
 import "template"
-import "strings"
 import "container/vector"
 import "sort"
 import "crypto/sha1"
 import "json"
 import "time"
+import "log"
+
+var logger *log.Logger
+var loggerTab = "                    "
 
 const boardSize = 4
 
@@ -30,6 +33,7 @@ type Solution struct {
    timer *time.Timer
 }
 
+
 var addr = flag.String("addr", ":3000", "http service address")
 var fmap = template.FormatterMap{
     "words": template.StringFormatter,
@@ -39,16 +43,20 @@ var templ = template.MustParse(templateStr, fmap)
 var dict *Trie
 var solutionBasket map[string]Solution
 
+
 func main(){
+   logger = log.New(os.Stdout,"",log.LstdFlags)
    dict = new(Trie)
+   
+   logger.Printf("Starting server\n")
    
    file, err := os.Open("dictionary.txt")
    if err != nil{
-      fmt.Printf("There was an error opening the dictionary\n")
+      logger.Printf("There was an error opening the dictionary\n")
       return
    }
    reader := bufio.NewReader(file)
-   fmt.Printf("Loading dictionary....")
+   logger.Printf("Loading dictionary")
    i := 0
    for {
       line, _, err := reader.ReadLine()
@@ -59,7 +67,7 @@ func main(){
       addWord(dict,line)
       i++
    }
-   fmt.Printf("DONE\n  Loaded %d words\n",i)
+   logger.Printf("Loaded %d words\n",i)
    file.Close()
    
    solutionBasket = make(map[string]Solution)
@@ -74,8 +82,7 @@ func main(){
 func solutionRequest(w http.ResponseWriter, req *http.Request){
    id := req.FormValue("id")
    
-   fmt.Printf("\n<----------------------SOLUTION REQUEST------------------------>\n")
-   fmt.Printf("ID: %s\n",id)
+   logger.Printf("SOLUTION REQUEST\n%sID: %s\n",loggerTab,id)
    
    solution,exists := solutionBasket[id]
    if !exists {
@@ -99,20 +106,12 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
    }
    
    
-   fmt.Printf("\n<------------------------HASH REQUEST-------------------------->\n")
+   
    var letters []uint8 = make([]uint8,len(lettersIn))
    for i := 0; i<len(lettersIn); i++ {
       letters[i] = letterToInt(lettersIn[i])
    }
    
-   fmt.Printf("board: \n")
-   for i := 0; i<boardSize; i++ {
-      for j := 0; j<boardSize; j++{
-         letter := intToLetter(letterAt(i,j,letters))
-         fmt.Printf(" %s",strings.ToUpper(string(letter)))
-      }
-      fmt.Printf("\n")
-   }
    
    
    solution := new(Solution)
@@ -150,14 +149,13 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
    solutionBasket[id] = *solution
    
    
-   fmt.Printf("ID: %s\n",solution.Id)
+   logger.Printf("HASH REQUEST\n%sID: %s\n",loggerTab,solution.Id)
 
    templ.Execute(w, response)
 }
 
 func solutionExpired(id string){
-   fmt.Printf("\n<----------------------SOLUTION EXPIRED------------------------>\n")
-   fmt.Printf("ID: %s\n",id)
+   logger.Printf("SOLUTION EXPIRED\n%sID: %s",loggerTab,id)
    var a Solution
    solutionBasket[id] = a,false
 }
