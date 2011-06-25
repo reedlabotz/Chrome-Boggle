@@ -1,16 +1,17 @@
 {
-  "name": "Boggle",
-  "description": "The game of Boggle",
-  "version": "0.0.1",
+  "name": "Shambles",
+  "description": "Find the words in the mixed up tiles!",
+  "version": "0.0.2",
   "app": {
     "launch": {
-      "local_path": "boggle.html"
+      "local_path": "main.html"
     }
   },
   "icons": {
-    "160": "icon.png"
+    "128": "icon.png",
+    "16" : "icon_16.png"
   },
   "permissions": [ 
-   "http://localhost/" 
+   "http://madebyreed.com/" 
   ]
 }
