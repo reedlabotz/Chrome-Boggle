@@ -48,7 +48,7 @@ func init(){
    
    file, err := os.Open("dictionary.txt")
    if err != nil{
-      fmt.Printf("There was an error opening the dictionary\n")
+      fmt.Errorf("There was an error opening the dictionary\n")
       return
    }
    reader := bufio.NewReader(file)
