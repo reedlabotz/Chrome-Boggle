@@ -211,6 +211,8 @@ function getScore(word){
 }
 
 function endGame(){
+   $("#endGame").hide();
+   $("#loadSolution").show();
    clearTimeout(timeout);
    clearInterval(interval);
    $('#wordEntry').attr("disabled", true);
@@ -224,9 +226,9 @@ function endGame(){
          }
       });
       checkScrollbar();
+      $("#loadSolution").hide();
+      $("#shake").show();
    });
-   $("#shake").show();
-   $("#endGame").hide();
 }
 
 function resizeScreen(){
