@@ -1,40 +1,81 @@
 body{
    font-family:helvetica;
+   background:#e8e8e8;
+   margin:0px;
+   padding:0px;
+   overflow:hidden;
+   width:200%;
+}
+
+#leftColumn{
+   float:left;
+   margin-top:20px;
+   margin-right:20px;
+   margin-left:20px;
+   margin-bottom:20px;
+}
+
+#rightColumn{
+   float:left;
+   margin-top:20px;
+   margin-right:20px;
+   margin-bottom:20px;
+   width:420px;
+}
+
+#timer{
+   margin-left:auto;
+   margin-right:auto;
+   margin-bottom:10px;
+   text-align:center;
+   display:block;
+   width:100px;
+   border-radius:3px;
+   font-size:20px;
+   background:#e8e8e8;
+}
+
+#correctHold{
+   height:32px;
+   font-size:16px;
+   line-height:20px;
 }
 
 #board table{
    border:none;
-   border-spacing:8px;
+   border-spacing:2px;
 }
 #board{
-   background:#F0F0F0;
-   border-radius:3px;
+   background:#adbdd2;
+   border-radius:5px;
    display:block;
-   float:left;
+   margin-bottom:10px;
 }
 #board td {
-  width: 48px;
-  height: 48px;
+  width:55px;
+  height:55px;
   text-align: center;
-  font-size: 40px;
+  font-size: 35px;
+  line-height:55px;
   font-weight:bold; 
-  background:#e2d6cf;
-  border-radius:3px;
-  border:1px solid #603a27;
-  padding:5px;
+  background:#FFFFFF;
+  border-radius:2px;
+  /*border:1px solid #C9BE62;*/
   font-size: 34px;
+  padding:0px;
 }
 
 td .qu {
-  font-size: 34px;
+  font-size: 30px;
 }
 
 #wordEntry{
-   border:1px solid black;
-   border-radius:10px;
+   border:2px solid #adbdd2;
+   border-radius:5px;
    background:#FFFFFF;
    padding:5px;
    padding-left:15px;
+   width:100%;
 }
 
 #wordEntry:focus{
@@ -47,11 +88,13 @@ td .qu {
    list-style:none;
    padding:0px;
    margin:0px;
-   border:1px solid black;
    padding:10px;
-   height:200px;
+   height:230px;
    width:400px;
-   overflow-x:auto;
+   background:#ffffff;
+   border-radius:5px;
+   border:2px solid #adbdd2;
+   overflow-x:hidden;
 }
 
 #wordList div{
@@ -63,3 +106,11 @@ td .qu {
    color:#E77471;
 }
 
+#endGame{
+   float:right;
+}
+
+#shake{
+   display:none;
+   float:right;
+}

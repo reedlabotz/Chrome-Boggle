@@ -1,34 +1,39 @@
 <html>
-  <head>
-    <title>Boggle!</title>
-    <script type="text/javascript" src="script/boggle.js"></script>
-    <script type="text/javascript" src="script/jquery.min.js"></script>
-    <script type="text/javascript" src="script/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="script/sha1.js"></script>
-    <link rel="stylesheet" href="style/style.css">
-    <script>
-    $(document).ready(function(){
-       $("#wordEntry").keypress(function(e){
-          code= (e.keyCode ? e.keyCode : e.which);
-          if (code == 13 || code == 32){
-            e.preventDefault();
-            checkWord();
-          }
-       });
-    })
+   <head>
+      <title>Boggle!</title>
+      <script type="text/javascript" src="script/boggle.js"></script>
+      <script type="text/javascript" src="script/jquery.min.js"></script>
+      <script type="text/javascript" src="script/jquery-ui.min.js"></script>
+      <script type="text/javascript" src="script/sha1.js"></script>
+      <link rel="stylesheet" href="style/style.css">
+      <script>
+      $(document).ready(function(){
+         $(window).resize(resizeScreen);
+         $("#wordEntry").keypress(function(e){
+            code= (e.keyCode ? e.keyCode : e.which);
+               if (code == 13 || code == 32){
+                  e.preventDefault();
+                  checkWord();
+               }
+            });
+         });
     </script>
-  </head>
-  <body onLoad="boggle_init()">
-     <h1>Boggle!</h1>
-     <div id="timer"></div>
-     <div id="board">
-     </div>
-     <div id="endGame"><input type="button" onclick="endGame();" value="Give Up" /></div>
-     <div id="stats"></div>
-     <div id="wordEntryHolde">
+   </head>
+   <body onLoad="boggle_init()" onscroll="window.scrollTo(0,0);">
+      <div id="leftColumn">
+         <div id="timer">3:00</div>
+         <div id="board"></div>
+         <div id="wordEntryHolder">
             <input type="text" id="wordEntry" />
+         </div>
       </div>
-     <div id="wordList">
-     </div>
+      <div id="rightColumn">
+         <div id="correctHold">
+            Score: <span id="score">0</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Correct: <span id="correctCount">0</span>/<span id="totalCount">0</span>
+            <input type="button" onclick="endGame();" value="Give Up" id="endGame" />
+            <input type="button" onclick="shake();" value="Shake it!" id="shake" />
+         </div>
+         <div id="wordList"></div>
+      </div>
   </body>
 </html>
