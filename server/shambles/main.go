@@ -1,20 +1,17 @@
-package main
+package shambles
 
 import "fmt"
 import "os"
 import "bufio"
 import "http"
-import "flag"
 import "template"
 import "container/vector"
 import "sort"
 import "crypto/sha1"
 import "json"
 import "time"
-import "log"
-
-var logger *log.Logger
-var loggerTab = "                    "
+import "appengine"
+import "appengine/datastore"
 
 const boardSize = 4
 
@@ -33,30 +30,28 @@ type Solution struct {
    timer *time.Timer
 }
 
+type StoredSolution struct{
+   Words string
+   Timestamp datastore.Time
+}
 
-var addr = flag.String("addr", ":3000", "http service address")
+
 var fmap = template.FormatterMap{
     "words": template.StringFormatter,
 }
 var templ = template.MustParse(templateStr, fmap)
 
 var dict *Trie
-var solutionBasket map[string]Solution
 
-
-func main(){
-   logger = log.New(os.Stdout,"",log.LstdFlags)
+func init(){
    dict = new(Trie)
-   
-   logger.Printf("Starting server\n")
    
    file, err := os.Open("dictionary.txt")
    if err != nil{
-      logger.Printf("There was an error opening the dictionary\n")
+      fmt.Printf("There was an error opening the dictionary\n")
       return
    }
    reader := bufio.NewReader(file)
-   logger.Printf("Loading dictionary")
    i := 0
    for {
       line, _, err := reader.ReadLine()
@@ -67,36 +62,33 @@ func main(){
       addWord(dict,line)
       i++
    }
-   logger.Printf("Loaded %d words\n",i)
    file.Close()
    
-   solutionBasket = make(map[string]Solution)
    
-   
-   http.Handle("/",http.HandlerFunc(hashRequest))
-   http.Handle("/solution",http.HandlerFunc(solutionRequest))
-   err = http.ListenAndServe(*addr, nil)
-   
+   http.HandleFunc("/",hashRequest)
+   http.HandleFunc("/solution",solutionRequest)
 }
 
 func solutionRequest(w http.ResponseWriter, req *http.Request){
-   id := req.FormValue("id")
+   idString := req.FormValue("id")
+   id := datastore.NewKey("solution",idString,0,nil)
    
-   logger.Printf("SOLUTION REQUEST\n%sID: %s\n",loggerTab,id)
+   storedSolution := new(StoredSolution)
+   c := appengine.NewContext(req)
+   err := datastore.Get(c,id,storedSolution)
+   err2 := datastore.Delete(c,id)
    
-   solution,exists := solutionBasket[id]
-   if !exists {
+   if err != nil {
+      c.Errorf("SOLUTION REQUEST ERROR: %s\n",err)
       return
-   } 
+   }
+   if err2 != nil {
+      c.Errorf("SOLUTION DELETE ERROR: %s\n",err2)
+   }
    
-   response,_ := json.Marshal(solution.words)
+   c.Infof("SOLUTION REQUEST\n")
    
-   solution.timer.Stop()
-   
-   var a Solution
-   solutionBasket[id] = a,false
-   
-   templ.Execute(w, response)
+   templ.Execute(w, storedSolution.Words)
 }
 
 func hashRequest(w http.ResponseWriter, req *http.Request){
@@ -134,30 +126,24 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
    
    response,_ := json.Marshal(solution)
    
-
-   id := fmt.Sprintf("%s",solution.Id)
    
-   //set the timer                 210 000 000 000  - 3.5 minutes
-   solution.timer = time.AfterFunc(210000000000,func (){solutionExpired(id)})
+   id := datastore.NewKey("solution",fmt.Sprintf("%s",solution.Id),0,nil)
+   //store the solution to database
+   storedSolution := new(StoredSolution)
+   words,_ := json.Marshal(solution.words)
+   storedSolution.Words = string(words)
+   storedSolution.Timestamp = datastore.SecondsToTime(time.Seconds())
    
-   //remove all un needed content
-   solution.Hashs = nil
-   solution.SolutionSize = nil
+   c := appengine.NewContext(req)
+   _, err := datastore.Put(c,id,storedSolution)
+   if err != nil {
+      c.Errorf("HASH REQUEST ERROR: %s\n",err)
+      http.Error(w, err.String(), http.StatusInternalServerError)
+      return
+   }
    
-   
-   //add to the solution basket
-   solutionBasket[id] = *solution
-   
-   
-   logger.Printf("HASH REQUEST\n%sID: %s\n",loggerTab,solution.Id)
-
+   c.Infof("HASH REQUEST\n")
    templ.Execute(w, response)
-}
-
-func solutionExpired(id string){
-   logger.Printf("SOLUTION EXPIRED\n%sID: %s\n",loggerTab,id)
-   var a Solution
-   solutionBasket[id] = a,false
 }
 
 func checkString(x int, y int, letters []uint8, soFar []uint8,dict *Trie,solution *Solution){

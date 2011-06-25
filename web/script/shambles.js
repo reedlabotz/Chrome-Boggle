@@ -84,7 +84,7 @@ function shake() {
             board_id += letter.toLowerCase();
       }
    }
-   $.get("http://madebyreed.com:3000/?letters="+board_id,function(data){
+   $.get("http://localhost:8080/?letters="+board_id,function(data){
       results = $.parseJSON(data);
       for(i=0; i<board.height; i++) {
          for (j=0; j<board.width; j++) {
@@ -215,7 +215,7 @@ function endGame(){
    clearInterval(interval);
    $('#wordEntry').attr("disabled", true);
    $("#wordEntry").val("Game Over"); 
-   $.get("http://madebyreed.com:3000/solution?id="+results.Id,function(data){
+   $.get("http://localhost:8080/solution?id="+results.Id,function(data){
       solutionWords = $.parseJSON(data);
       $.each(solutionWords,function(i,word){
          if($.inArray(word,correctWords) < 0){

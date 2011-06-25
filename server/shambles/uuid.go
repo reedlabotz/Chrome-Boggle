@@ -4,7 +4,7 @@
 // new V4 (random) UID's.
 //
 // Uses crypto/rand for seed.
-package main
+package shambles
 
 import "crypto/rand"
 import "fmt"

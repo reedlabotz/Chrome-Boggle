@@ -12,6 +12,6 @@
     "16" : "icon_16.png"
   },
   "permissions": [ 
-   "http://madebyreed.com/" 
+   "http://localhost/" 
   ]
 }
