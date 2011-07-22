@@ -1,3 +1,7 @@
+var server = "http://wordshambles.appspot.com"
+//"http://localhost:8080"
+
+
 var cubes = new Array(
   new Array("T", "O", "E", "S", "S", "I"),
   new Array("A", "S", "P", "F", "F", "K"),
@@ -84,7 +88,7 @@ function shake() {
             board_id += letter.toLowerCase();
       }
    }
-   $.get("http://localhost:8080/?letters="+board_id,function(data){
+   $.get(server+"/?letters="+board_id,function(data){
       results = $.parseJSON(data);
       for(i=0; i<board.height; i++) {
          for (j=0; j<board.width; j++) {
@@ -217,7 +221,7 @@ function endGame(){
    clearInterval(interval);
    $('#wordEntry').attr("disabled", true);
    $("#wordEntry").val("Game Over"); 
-   $.get("http://localhost:8080/solution?id="+results.Id,function(data){
+   $.get(server+"/solution?id="+results.Id,function(data){
       solutionWords = $.parseJSON(data);
       $.each(solutionWords,function(i,word){
          if($.inArray(word,correctWords) < 0){

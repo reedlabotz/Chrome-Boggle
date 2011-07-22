@@ -31,7 +31,7 @@ type Solution struct {
 }
 
 type StoredSolution struct{
-   Words string
+   Words []byte
    Timestamp datastore.Time
 }
 
@@ -131,7 +131,7 @@ func hashRequest(w http.ResponseWriter, req *http.Request){
    //store the solution to database
    storedSolution := new(StoredSolution)
    words,_ := json.Marshal(solution.words)
-   storedSolution.Words = string(words)
+   storedSolution.Words = []byte(words)
    storedSolution.Timestamp = datastore.SecondsToTime(time.Seconds())
    
    c := appengine.NewContext(req)
